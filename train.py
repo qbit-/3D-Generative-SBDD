@@ -8,10 +8,12 @@ import torch.utils.tensorboard
 from torch_geometric.loader import DataLoader
 
 from models.maskfill import MaskFillModel
-from utils.datasets import *
-from utils.transforms import *
-from utils.misc import *
-from utils.train import *
+from utils.datasets import get_dataset
+from utils.transforms import (FeaturizeProteinAtom, FeaturizeLigandAtom, FeaturizeLigandBond,
+                              LigandCountNeighbors, get_mask, get_contrastive_sampler, Compose
+                              )
+from utils.misc import (load_config, get_logger, get_new_log_dir, seed_all)
+from utils.train import (inf_iterator, get_optimizer, get_scheduler)
 
 import torch_geometric.data.collate
 
@@ -59,6 +61,7 @@ if __name__ == '__main__':
         config = config.dataset,
         transform = transform,
     )
+
     train_set, val_set = subsets['train'], subsets['test']
     follow_batch = ['protein_element', 'ligand_context_element', 'pos_real', 'pos_fake']
     collate_exclude_keys = ['ligand_nbh_list']
