@@ -1,4 +1,5 @@
 import os
+import gzip
 import numpy as np
 from rdkit import Chem
 from rdkit.Chem.rdchem import BondType
@@ -27,9 +28,13 @@ class PDBProtein(object):
 
     def __init__(self, data, mode='auto'):
         super().__init__()
-        if (data[-4:].lower() == '.pdb' and mode == 'auto') or mode == 'path':
-            with open(data, 'r') as f:
-                self.block = f.read()
+        if ((data[-4:].lower() == '.pdb' or data[-7:].lower() == '.pdb.gz') and mode == 'auto') or mode == 'path':
+            if data.endswith('.pdb'):
+                with open(data, 'r') as f:
+                    self.block = f.read()
+            elif data.endswith('.pdb.gz'):
+                with gzip.open(data, 'rt') as f:
+                    self.block = f.read()
         else:
             self.block = data
 
@@ -206,15 +211,22 @@ def parse_sdf_file(path):
 
     fdefName = os.path.join(RDConfig.RDDataDir,'BaseFeatures.fdef')
     factory = ChemicalFeatures.BuildFeatureFactory(fdefName)
-    rdmol = next(iter(Chem.SDMolSupplier(path, removeHs=False)))
+    if path.endswith('.sdf'):
+        stream = open(path, 'rt')
+    elif path.enswith('.sdf.gz'):
+        stream = gzip.open(path, 'rt')
+    rdmol = next(iter(Chem.SDMolSupplier(stream, removeHs=False)))
     rd_num_atoms = rdmol.GetNumAtoms()
     feat_mat = np.zeros([rd_num_atoms, len(ATOM_FAMILIES)], dtype=np.long)
     for feat in factory.GetFeaturesForMol(rdmol):
         feat_mat[feat.GetAtomIds(), ATOM_FAMILIES_ID[feat.GetFamily()]] = 1
 
-    with open(path, 'r') as f:
-        sdf = f.read()
-
+    #with open(path, 'r') as f:
+    #   sdf = f.read()
+    stream.seek(0)
+    sdf = stream.read()
+    stream.close()
+    
     sdf = sdf.splitlines()
     num_atoms, num_bonds = map(int, [sdf[3][0:3], sdf[3][3:6]])
     assert num_atoms == rd_num_atoms

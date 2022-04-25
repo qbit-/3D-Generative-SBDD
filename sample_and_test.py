@@ -235,7 +235,7 @@ if __name__ == '__main__':
     logger.info('Start sampling')
 
     global_step = 0
-    global_timer = time.time()
+    t1 = time.time()
     while len(pool.finished) < config.sample.num_samples:
         global_step += 1
         queue_size = len(pool.queue)
@@ -304,5 +304,5 @@ if __name__ == '__main__':
         rd_mol = reconstruct_from_generated(data_finished)
         writer.write(rd_mol)
     writer.close()
-    elapsed = time.time() - global_timer
-    logger.info('Finished. Elapsed time: %.1f, %.1fs/item' % (elapsed, elapsed / config.sample.num_samples))
+    t2 = time.time()
+    logger.info('Finished. Elapsed time: %.1f, %.1fs/item' % (t2 - t1, (t2 - t1) / config.sample.num_samples))
