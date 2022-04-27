@@ -81,6 +81,9 @@ if __name__ == '__main__':
         ligand_atom_feature_dim = ligand_featurizer.feature_dim,
         protein_atom_feature_dim = protein_featurizer.feature_dim,
     ).to(args.device)
+    if hasattr(config.model, 'checkpoint') and config.model.checkpoint is not None:
+        ckpt = torch.load(config.model.checkpoint, map_location=args.device)
+        model.load_state_dict(ckpt['model'])
 
     # Optimizer and scheduler
     optimizer = get_optimizer(config.train.optimizer, model)
