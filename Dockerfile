@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=qbit271/micromamba-docker-cuda:0.21.0
+ARG BASE_IMAGE=qbit271/micromamba-docker-cuda:latest
 FROM $BASE_IMAGE
 
 ARG ENV_FILE=env_cuda115.yml
