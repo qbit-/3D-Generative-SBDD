@@ -18,3 +18,4 @@ dependencies:
   - openbabel=3.1.1
   - python-lmdb=0.99
   - tensorboard=2.7.0
+  - setuptools=59.5.0

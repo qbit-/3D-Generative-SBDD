@@ -212,10 +212,10 @@ def parse_sdf_file(path):
     fdefName = os.path.join(RDConfig.RDDataDir,'BaseFeatures.fdef')
     factory = ChemicalFeatures.BuildFeatureFactory(fdefName)
     if path.endswith('.sdf'):
-        stream = open(path, 'rt')
-    elif path.enswith('.sdf.gz'):
-        stream = gzip.open(path, 'rt')
-    rdmol = next(iter(Chem.SDMolSupplier(stream, removeHs=False)))
+        stream = open(path, 'rb')
+    elif path.endswith('.sdf.gz'):
+        stream = gzip.open(path, 'rb')
+    rdmol = next(iter(Chem.ForwardSDMolSupplier(stream, removeHs=False)))
     rd_num_atoms = rdmol.GetNumAtoms()
     feat_mat = np.zeros([rd_num_atoms, len(ATOM_FAMILIES)], dtype=np.long)
     for feat in factory.GetFeaturesForMol(rdmol):
@@ -224,7 +224,7 @@ def parse_sdf_file(path):
     #with open(path, 'r') as f:
     #   sdf = f.read()
     stream.seek(0)
-    sdf = stream.read()
+    sdf = stream.read().decode()
     stream.close()
     
     sdf = sdf.splitlines()
